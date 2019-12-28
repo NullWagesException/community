@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/jquery-3.4.1.min.js"></script>
+    <link rel="stylesheet" href="js/layui/css/layui.css">
+</head>
+<body>
+<div class="layui-form-item">
+    <blockquote id="name" class="layui-elem-quote">小区名字:</blockquote>
+    <blockquote id="water" class="layui-elem-quote">水费:</blockquote>
+    <blockquote id="electric" class="layui-elem-quote">电费:</blockquote>
+</div>
+</body>
+<script>
+    $.ajax({
+        type:'get',
+        url:'property_selectSelf.action',
+        dataType:'json',
+        success:function (result) {
+            $("#name").html("房间号:&nbsp&nbsp" + result.message.name);
+            $("#water").html("水&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp费:&nbsp&nbsp" + result.message.water);
+            $("#electric").html("电&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp费:&nbsp&nbsp" + result.message.electric);
+        },
+        error:function () {
+            layer.close(registerLoadIndex);
+            layer.alert("请求超时！")
+        }
+    });
+</script>
+</html>

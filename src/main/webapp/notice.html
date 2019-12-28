@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/jquery-3.4.1.min.js"></script>
+    <link rel="stylesheet" href="js/layui/css/layui.css">
+    <link rel="stylesheet" href="css/adminLogin.css">
+</head>
+<body>
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+    <legend>公告</legend>
+</fieldset>
+<ul class="layui-timeline" id="timeline">
+</ul>
+</body>
+
+
+<script>
+    $.ajax({
+        //几个参数需要注意一下
+        type: 'get',//方法类型
+        dataType: "json",//预期服务器返回的数据类型
+        url: window.location.protocol+'//'+window.location.host+'/community/notice_selectAll.action',
+        success: function (result) {
+            console.log(result);
+            if (result.desc == "OK") {
+                var context = "";
+                for (var i = 0; i < result.message.length; i++) {
+                    var str = result.message[i].time;
+                    context += '<li class="layui-timeline-item">' +
+                        '<i class="layui-icon layui-timeline-axis"></i>\n' +
+                        '<div class="layui-timeline-content layui-text">\n';
+                    context += '<h3 class="layui-timeline-title">' + str.replace("T"," ") + '</h3>' +
+                                '<p>' + result.message[i].text + ' </p>\n' +
+                        '        </div>\n' +
+                        '    </li>';
+                }
+                console.log(context);
+                $("#timeline").html(context);
+            };
+            if (result.desc == "FAIL") {
+                layer.msg(result.message);
+            };
+        },
+        error : function() {
+            ;!function(){
+                var layer = layui.layer
+                    ,form = layui.form;
+
+                layer.msg("服务器异常");
+            }();
+        }
+    });
+
+
+</script>
+</html>

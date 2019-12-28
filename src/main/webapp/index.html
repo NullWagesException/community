@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>社区管理和交流平台</title>
+    <link rel="stylesheet" href="css/self.css">
+    <link rel="stylesheet" href="js/layui/css/layui.css">
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo">社区管理和交流平台</div>
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a id="username" href="javascript:;">
+                    欢迎您：root
+                </a>
+                <dl class="layui-nav-child">
+                    <dd>
+                        <a id="selfMessage" href="javascript:;" >个人资料</a></dd>
+                    <dd>
+                        <a id="updateMessage" href="javascript:;" >修改信息</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item"><a href="#" onclick="loginOut()">退出登录</a></li>
+        </ul>
+    </div>
+
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <!-- 左侧垂直导航区域-->
+            <ul class="layui-nav layui-nav-tree" lay-filter="test">
+                <li class="layui-nav-item">
+                    <a href="javascript:;">公告栏</a>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="javascript:;" data-id="1" data-title="公告栏" data-url="notice.html"
+                               class="site-demo-active" data-type="tabAdd">公告栏</a></dd>
+                        <dd>
+                        <a id="noticeList" href="javascript:;" data-id="2" data-title="公告栏信息" data-url="noticeList.html"
+                           class="site-demo-active" data-type="tabAdd">公告栏信息</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;">物业信息</a>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="javascript:;" data-id="3" data-title="查看物业信息" data-url="property.html"
+                               class="site-demo-active" data-type="tabAdd">查看物业信息</a></dd>
+                        <dd>
+                        <a id="properList" href="javascript:;" data-id="4" data-title="物业信息管理" data-url="propertyList.html"
+                           class="site-demo-active" data-type="tabAdd">物业信息管理</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item">
+                <a href="javascript:;">失物招领</a>
+                <dl class="layui-nav-child">
+                    <dd>
+                        <a href="javascript:;" data-id="5" data-title="浏览失物招领" data-url="lostAllList.html"
+                           class="site-demo-active" data-type="tabAdd">浏览失物招领</a></dd>
+                    <dd>
+                        <a id="lostAllList" href="javascript:;" data-id="6" data-title="失物招领管理" data-url="lostList.html"
+                           class="site-demo-active" data-type="tabAdd">失物招领管理</a></dd>
+                </dl>
+            </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;">意见反馈</a>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a id="feedback" href="javascript:;" data-id="7" data-title="我的反馈" data-url="feedback.html"
+                               class="site-demo-active" data-type="tabAdd">我的反馈</a></dd>
+                        <dd>
+                            <a id="feedbackList" href="javascript:;" data-id="8" data-title="反馈管理" data-url="feedbackList.html"
+                               class="site-demo-active" data-type="tabAdd">反馈管理</a></dd>
+                    </dl>
+                </li>
+
+                <li class="layui-nav-item">
+                    <a href="javascript:;">用户管理</a>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a id="userList" href="javascript:;" data-id="9" data-title="用户管理" data-url="userList.html"
+                               class="site-demo-active" data-type="tabAdd">用户管理</a></dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!--tab标签-->
+    <div class="layui-tab" lay-filter="demo" lay-allowclose="true" style="margin-left: 200px;">
+        <ul class="layui-tab-title"></ul>
+        <div class="layui-tab-content"></div>
+    </div>
+
+    <div class="layui-body" id="body">
+        <!-- 内容主体区域 -->
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+            <legend>社区管理和交流平台</legend>
+        </fieldset>
+
+        <blockquote class="layui-elem-quote">右侧选择功能，右上方查看个人以及退出</blockquote>
+    </div>
+
+    <div class="layui-footer" style="text-align:center;">
+        <!-- 底部固定区域 -->
+        © 社区管理和交流平台
+    </div>
+</div>
+<script src="js/jquery-3.4.1.min.js"></script>
+<script src="js/layui/layui.js"></script>
+<script>
+
+    //进入界面需要发送请求检查是否登录以及是否为管理员
+    $.ajax({
+        //几个参数需要注意一下
+        type: 'get',//方法类型
+        dataType: "json",//预期服务器返回的数据类型
+        url: window.location.protocol+'//'+window.location.host+'/community/user_getUser.action',
+        success: function (result) {
+            console.log(result);//打印服务端返回的数据(调试用)
+            if (result.desc == "OK") {
+                $("#username").html("欢迎您：" + result.message.username) ;
+                if (result.message.isadmin == "0"){
+                    //此时不是管理员，删除不用的
+                    $("#noticeList").remove();
+                    $("#properList").remove();
+                    $("#lostAllList").remove();
+                    $("#feedbackList").remove();
+                    $("#userList").remove();
+                }else{
+                    $("#feedback").remove();
+                }
+            };
+            if (result.desc == "FAIL") {
+                window.location.href = 'login.html';
+            };
+        },
+        error : function() {
+            window.location.href = 'login.html';
+            }
+    });
+
+
+    layui.use(['element', 'layer', 'jquery'], function () {
+        var element = layui.element;
+        // var layer = layui.layer;
+        var $ = layui.$;
+        // 配置tab实践在下面无法获取到菜单元素
+        $('.site-demo-active').on('click', function () {
+            var body = document.getElementById("body");
+            body.style.display="none";
+            var dataid = $(this);
+            //这时会判断右侧.layui-tab-title属性下的有lay-id属性的li的数目，即已经打开的tab项数目
+            if ($(".layui-tab-title li[lay-id]").length <= 0) {
+                //如果比零小，则直接打开新的tab项
+                active.tabAdd(dataid.attr("data-url"), dataid.attr("data-id"), dataid.attr("data-title"));
+            } else {
+                //否则判断该tab项是否以及存在
+                var isData = false; //初始化一个标志，为false说明未打开该tab项 为true则说明已有
+                $.each($(".layui-tab-title li[lay-id]"), function () {
+                    //如果点击左侧菜单栏所传入的id 在右侧tab项中的lay-id属性可以找到，则说明该tab项已经打开
+                    if ($(this).attr("lay-id") == dataid.attr("data-id")) {
+                        isData = true;
+                    }
+                })
+                if (isData == false) {
+                    //标志为false 新增一个tab项
+                    active.tabAdd(dataid.attr("data-url"), dataid.attr("data-id"), dataid.attr("data-title"));
+                }
+            }
+            //最后不管是否新增tab，最后都转到要打开的选项页面上
+            active.tabChange(dataid.attr("data-id"));
+        });
+
+        var active = {
+            //在这里给active绑定几项事件，后面可通过active调用这些事件
+            tabAdd: function (url, id, name) {
+                //新增一个Tab项 传入三个参数，分别对应其标题，tab页面的地址，还有一个规定的id，是标签中data-id的属性值
+                //关于tabAdd的方法所传入的参数可看layui的开发文档中基础方法部分
+                element.tabAdd('demo', {
+                    title: name,
+                    content: '<iframe data-frameid="' + id + '" scrolling="auto" frameborder="0" src="' + url + '" style="width:100%;height:99%;"></iframe>',
+                    id: id //规定好的id
+                })
+                FrameWH();  //计算ifram层的大小
+            },
+            tabChange: function (id) {
+                //切换到指定Tab项
+                element.tabChange('demo', id); //根据传入的id传入到指定的tab项
+            },
+            tabDelete: function (id) {
+                element.tabDelete("demo", id);//删除
+            }
+        };
+        function FrameWH() {
+            var h = $(window).height();
+            $("iframe").css("height",h+"px");
+        }
+
+        // 用户个人资料
+        $('#selfMessage').click(function () {
+            self();
+        });
+
+        // 更新用户个人资料
+        $('#updateMessage').click(function () {
+            updateMessage();
+        });
+
+        // 更新用户数据
+        function updateMessage() {
+            showUser_update();
+            layer.open({
+                type:'1',
+                content:$('.updateSelfPage'),
+                title:'个人信息',
+                area:['430px','400px'],
+                btn:['修改','重置','取消'],
+                closeBtn:'1',
+                btn1:function (index,layero) {
+                    //修改回调
+                    layer.close(index);
+                    var username = $('#updateUsername').val();
+                    var passwordOld = $('#updatePasswordOld').val();
+                    var passwordNew = $('#updatePasswordNew').val();
+                    var realUsername = $('#updateRealUsername').val();
+                    if (realUsername == "" || username == ""){
+                        layer.alert("请正确填写");
+                        return false;
+                    }
+                    var params = {};
+                    params.username = username;
+                    params.password = passwordOld;
+                    params.passwordNew = passwordNew;
+                    params.realname = realUsername;
+                    var registerLoadIndex = layer.load(2);
+                    $.ajax({
+                        type:'post',
+                        url:window.location.protocol+'//'+window.location.host+'/community/user_update.action',
+                        dataType:'json',
+                        data:JSON.stringify(params),
+                        contentType:'application/json',
+                        success:function (result) {
+                            layer.close(registerLoadIndex);
+                            layer.msg(result.message);
+                        },
+                        error:function () {
+                            layer.close(registerLoadIndex);
+                            layer.alert("请求超时！")
+                        }
+                    });
+                },
+                btn2:function (index,layero) {
+                    //重置回调
+                    var registerUsername = $('#registerUsername').val("");
+                    var registerPassword = $('#registerPassword').val("");
+                    var registerWellPassword = $('#registerWellPassword').val("");
+                    // 防止注册页面关闭
+                    return false;
+                },
+                btn3:function (index,layero) {
+                    //取消回调
+                }
+            })
+        }
+
+        // 个人信息
+        function self() {
+            $.ajax({
+                type: 'get',//方法类型
+                dataType: "json",//预期服务器返回的数据类型
+                url: window.location.protocol+'//'+window.location.host+'/community/user_getUser.action',
+                success: function (result) {
+                    console.log(result);//打印服务端返回的数据(调试用)
+                    if (result.desc == "OK") {
+                        $("#self_Username").val(result.message.username) ;
+                        $("#self_realUsername").val(result.message.realname) ;
+                    };
+                    if (result.desc == "FAIL") {
+                        window.location.href = 'login.html';
+                    };
+                },
+                error : function() {
+                    window.location.href = 'login.html';
+                }
+            });
+            layer.open({
+                type:'1',
+                content:$('.selfPage'),
+                title:'个人资料',
+                area:['430px','300px'],
+                btn:['关闭'],
+                closeBtn:'1',
+                btn0:function (index,layero) {
+                }
+            })
+        }
+    });
+
+    function showUser_update() {
+        $.ajax({
+            type: 'get',//方法类型
+            dataType: "json",//预期服务器返回的数据类型
+            url: window.location.protocol+'//'+window.location.host+'/community/user_getUser.action',
+            success: function (result) {
+                console.log(result);//打印服务端返回的数据(调试用)
+                if (result.desc == "OK") {
+                    $("#updateUsername").val(result.message.username) ;
+                    $("#updateRealUsername").val(result.message.realname) ;
+                };
+                if (result.desc == "FAIL") {
+                    window.location.href = 'login.html';
+                };
+            },
+            error : function() {
+                window.location.href = 'login.html';
+            }
+        });
+    }
+
+    function loginOut(){
+        $.ajax({
+            //几个参数需要注意一下
+            type: 'get',//方法类型
+            dataType: "json",//预期服务器返回的数据类型
+            url: window.location.protocol+'//'+window.location.host+'/community/user_loginout.action',
+            success: function (result) {
+                console.log(result);//打印服务端返回的数据(调试用)
+                if (result.desc == "OK") {
+                    layer.msg(result.message);
+                    window.location.href = 'login.html';
+                };
+                if (result.desc == "FAIL") {
+                    layer.msg(result.message);
+                };
+            },
+            error : function() {
+                ;!function(){
+                    var layer = layui.layer
+                        ,form = layui.form;
+
+                    layer.msg("服务器异常");
+                }();
+            }
+        });
+    }
+</script>
+</body>
+<div class="selfPage">
+    <div class="registerDiv">
+        <form>
+            <div class="usernameWrapDiv">
+                <div class="usernameLabel">
+                    <label>用户名:</label>
+                </div>
+                <div class="usernameDiv">
+                    <i class="layui-icon layui-icon-username adminIcon"></i>
+                    <input id="self_Username" readonly="readonly" class="layui-input adminInput" type="text" name="username" placeholder="输入用户名" >
+                </div>
+            </div>
+            <div class="usernameWrapDiv">
+                <div class="usernameLabel">
+                    <label>真实姓名:</label>
+                </div>
+                <div class="usernameDiv">
+                    <i class="layui-icon layui-icon-username adminIcon"></i>
+                    <input id="self_realUsername"  readonly="readonly" class="layui-input adminInput" type="text" name="realname" placeholder="输入真实姓名" >
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="updateSelfPage">
+    <div class="registerDiv">
+        <form>
+            <div class="usernameWrapDiv">
+                <div class="usernameLabel">
+                    <label>用户名:</label>
+                </div>
+                <div class="usernameDiv">
+                    <i class="layui-icon layui-icon-username adminIcon"></i>
+                    <input id="updateUsername" class="layui-input adminInput" type="text" name="username" placeholder="输入用户名" >
+                </div>
+            </div>
+            <div class="usernameWrapDiv">
+                <div class="usernameLabel">
+                    <label>初始密码:</label>
+                </div>
+                <div class="passwordDiv">
+                    <i class="layui-icon layui-icon-password adminIcon"></i>
+                    <input id="updatePasswordOld" class="layui-input adminInput" type="password" name="password" placeholder="输入密码">
+                </div>
+            </div>
+            <div class="usernameWrapDiv">
+                <div class="usernameLabel">
+                    <label>新密码:</label>
+                </div>
+                <div class="passwordDiv">
+                    <i class="layui-icon layui-icon-password adminIcon"></i>
+                    <input id="updatePasswordNew" class="layui-input adminInput" type="password" name="password" placeholder="输入密码">
+                </div>
+            </div>
+            <div class="usernameWrapDiv">
+                <div class="usernameLabel">
+                    <label>真实姓名:</label>
+                </div>
+                <div class="usernameDiv">
+                    <i class="layui-icon layui-icon-username adminIcon"></i>
+                    <input id="updateRealUsername" class="layui-input adminInput" type="text" name="realname" placeholder="输入真实姓名" >
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</html>

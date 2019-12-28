@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+
+
+<struts>
+
+    <package name="All"  namespace="/" extends="struts-default,json-default">
+        <action name="user_*" class="com.zfalse.action.UserAction" method="{1}">
+            <interceptor-ref name="json"/>
+            <result name="success" type="json">
+                <param name="root">result</param>
+            </result>
+            <result name="table" type="json">
+                <param name="root">tableDataDTO</param>
+            </result>
+            <allowed-methods>loginout,register,login,getUser,update,selectTable,delete,update,updateAdmin</allowed-methods>
+        </action>
+
+        <action name="notice_*" class="com.zfalse.action.NoticeAction" method="{1}">
+            <interceptor-ref name="json"/>
+            <result name="success" type="json">
+                <param name="root">result</param>
+            </result>
+            <result name="table" type="json">
+                <param name="root">tableDataDTO</param>
+            </result>
+            <allowed-methods>selectAll,save,update,selectTable,delete</allowed-methods>
+        </action>
+
+        <action name="property_*" class="com.zfalse.action.PropertyAction" method="{1}">
+            <interceptor-ref name="json"/>
+            <result name="success" type="json">
+                <param name="root">result</param>
+            </result>
+            <result name="table" type="json">
+                <param name="root">tableDataDTO</param>
+            </result>
+            <allowed-methods>selectAll,save,update,selectTable,delete,selectSelf</allowed-methods>
+        </action>
+
+        <action name="lost_*" class="com.zfalse.action.LostAction" method="{1}">
+            <interceptor-ref name="json"/>
+            <result name="success" type="json">
+                <param name="root">result</param>
+            </result>
+            <result name="table" type="json">
+                <param name="root">tableDataDTO</param>
+            </result>
+            <allowed-methods>selectAll,save,update,selectTable,delete,selectSelf</allowed-methods>
+        </action>
+
+        <action name="feedBack_*" class="com.zfalse.action.FeedBackAction" method="{1}">
+            <interceptor-ref name="json"/>
+            <result name="success" type="json">
+                <param name="root">result</param>
+            </result>
+            <result name="table" type="json">
+                <param name="root">tableDataDTO</param>
+            </result>
+            <allowed-methods>selectAll,save,update,selectTable,delete,selectSelf</allowed-methods>
+        </action>
+    </package>
+
+</struts>

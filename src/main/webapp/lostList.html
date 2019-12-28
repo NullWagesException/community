@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>物业信息管理</title>
+    <script src="js/jquery-3.4.1.min.js"></script>
+    <link rel="stylesheet" href="css/lost.css">
+    <link rel="stylesheet" href="js/layui/css/layui.css">
+    <style>
+        body{margin: 10px;}
+        .demo-carousel{height: 200px; line-height: 200px; text-align: center;}
+    </style>
+</head>
+<body>
+
+<table class="layui-hide" id="demo" lay-filter="test"></table>
+
+
+
+
+
+<script src="js/layui/layui.js"></script>
+<script>
+    layui.use(['laydate', 'laypage', 'layer', 'table', 'carousel', 'upload', 'element', 'slider'], function(){
+        var laypage = layui.laypage //分页
+            ,layer = layui.layer //弹层
+            ,table = layui.table //表格
+            ,upload = layui.upload //上传
+            ,element = layui.element //元素操作
+
+
+        //执行一个 table 实例
+        table.render({
+            elem: '#demo'
+            ,height: 420
+            ,url: 'lost_selectSelf.action' //数据接口
+            ,title: '用户表'
+            ,page: true //开启分页
+            ,toolbar: 'default' //开启工具栏，此处显示默认图标，可以自定义模板，详见文档
+            ,totalRow: true //开启合计行
+            ,cols: [[ //表头
+                {type: 'checkbox', fixed: 'left'}
+                ,{field: 'id', title: 'ID', width:80, sort: true, fixed: 'left', totalRowText: '合计：'}
+                ,{field: 'name', title: '标题', sort: true,width:180}
+                ,{field: 'date', title: '时间', sort: true,width:180}
+                ,{field: 'user', title: '发布用户', sort: true}
+                ,{field: 'finish', title: '是否完成', sort: true}
+                ,{field: 'message', title: '详细信息', sort: true,width:480}
+            ]]
+        });
+
+        //监听头工具栏事件
+        table.on('toolbar(test)', function(obj){
+            var checkStatus = table.checkStatus(obj.config.id)
+                ,data = checkStatus.data; //获取选中的数据
+            switch(obj.event){
+                case 'add':
+                    layer.open({
+                        type:'1',
+                        content:$('.addLostPage'),
+                        title:'添加物业信息',
+                        area:['530px','400px'],
+                        btn:['添加','重置','取消'],
+                        closeBtn:'1',
+                        btn1:function (index,layero) {
+                            //添加回调
+                            layer.close(index);
+                            var name = $('#addLost_name').val();
+                            var message = $('#addLost_message').val();
+                            var finish = $('#addLost_finish').val();
+                            if (name == "" || message =="" || finish == ""){
+                                layer.alert("请正确填写");
+                                return false;
+                            }
+                            var params = {};
+                            params.name = name;
+                            params.finish = finish;
+                            params.message = message;
+
+                            var registerLoadIndex = layer.load(2);
+                            $.ajax({
+                                type:'post',
+                                url:'lost_save.action',
+                                dataType:'json',
+                                data:JSON.stringify(params),
+                                contentType:'application/json',
+                                success:function (result) {
+                                    layer.close(registerLoadIndex);
+                                    layer.msg(result.message);
+                                    table.reload('demo', {
+                                        url: 'lost_selectSelf.action?page=1&limit=10'
+                                    });
+                                },
+                                error:function () {
+                                    layer.close(registerLoadIndex);
+                                    layer.alert("请求超时！")
+                                }
+                            });
+                        },
+                        btn2:function (index,layero) {
+                            //重置回调
+                            var name = $('#addLost_name').val("");
+                            var message = $('#addLost_message').val("");
+                            var finish = $('#addLost_finish').val("");
+                            return false;
+                        },
+                        btn3:function (index,layero) {
+                            //取消回调
+                        }
+                    });
+                    break;
+                case 'update':
+                    if(data.length === 0){
+                        layer.msg('请选择一行');
+                    } else if(data.length > 1){
+                        layer.msg('只能同时编辑一个');
+                    } else {
+                        layer.alert('编辑 [id]：'+ checkStatus.data[0].id);
+                        $('#addLost_name').val(checkStatus.data[0].name);
+                        $('#addLost_message').val(checkStatus.data[0].message);
+                        $('#addLost_finish').val(checkStatus.data[0].finish);
+                        layer.open({
+                            type:'1',
+                            content:$('.addLostPage'),
+                            title:'修改物业信息',
+                            area:['530px','400px'],
+                            btn:['修改','重置','取消'],
+                            closeBtn:'1',
+                            btn1:function (index,layero) {
+                                //发布回调
+                                layer.close(index);
+                                var name = $('#addLost_name').val();
+                                var message = $('#addLost_message').val();
+                                var finish = $('#addLost_finish').val();
+                                if (name == "" || message =="" || finish == ""){
+                                    layer.alert("请正确填写");
+                                    return false;
+                                }
+                                var params = {};
+                                params.name = name;
+                                params.finish = finish;
+                                params.message = message;
+                                params.id = checkStatus.data[0].id;
+                                var registerLoadIndex = layer.load(2);
+                                $.ajax({
+                                    type:'post',
+                                    url:'lost_update.action',
+                                    dataType:'json',
+                                    data:JSON.stringify(params),
+                                    contentType:'application/json',
+                                    success:function (result) {
+                                        layer.close(registerLoadIndex);
+                                        layer.msg(result.message);
+                                        table.reload('demo', {
+                                            url: 'lost_selectSelf.action?page=1&limit=10'
+                                        });
+                                    },
+                                    error:function () {
+                                        layer.close(registerLoadIndex);
+                                        layer.alert("请求超时！")
+                                    }
+                                });
+                            },
+                            btn2:function (index,layero) {
+                                //重置回调
+                                var registerUsername = $('#notice_text').val("");
+                                return false;
+                            },
+                            btn3:function (index,layero) {
+                                //取消回调
+                            }
+                        });
+                    }
+                    break;
+                case 'delete':
+                    if(data.length === 0){
+                        layer.msg('请选择一行');
+                    } else {
+                        $.ajax({
+                            type:'get',
+                            url:'lost_delete.action?id=' + checkStatus.data[0].id,
+                            dataType:'json',
+                            success:function (result) {
+                                layer.msg(result.message);
+                                table.reload('demo', {
+                                    url: 'lost_selectSelf.action?page=1&limit=10'
+                                });
+                            },
+                            error:function () {
+                                layer.close(registerLoadIndex);
+                                layer.alert("请求超时！")
+                            }
+                        });
+                    }
+                    break;
+            };
+        });
+
+
+
+        //分页
+        laypage.render({
+            elem: 'pageDemo' //分页容器的id
+            ,count: 100 //总页数
+            ,skin: '#1E9FFF' //自定义选中色值
+            //,skip: true //开启跳页
+            ,jump: function(obj, first){
+                if(!first){
+                    layer.msg('第'+ obj.curr +'页', {offset: 'b'});
+                }
+            }
+        });
+
+        //上传
+        upload.render({
+            elem: '#uploadDemo'
+            ,url: '' //上传接口
+            ,done: function(res){
+                console.log(res)
+            }
+        });
+
+
+    });
+</script>
+</body>
+<div class="addLostPage">
+    <div class="registerDiv">
+        <form>
+            <div class="usernameWrapDiv">
+                <div class="usernameLabel">
+                    <label>标题:</label>
+                </div>
+                <div class="usernameDiv">
+                    <input id="addLost_name" class="layui-input adminInput" type="text" name="username" placeholder="输入标题" >
+                </div>
+            </div>
+            <div class="layui-form">
+                <div class="usernameLabel">
+                    <label>是否完成:</label>
+                </div>
+                <div class="usernameDiv">
+                    <select id="addLost_finish" name="interest" lay-filter="aihao">
+                        <option value="未完成" selected="">未完成</option>
+                        <option value="已完成">已完成</option>
+                    </select>
+                </div>
+            </div>
+            <div class="usernameWrapDiv">
+                <div class="usernameLabel">
+                    <label>详细信息:</label>
+                </div>
+                <div class="usernameDiv">
+                    <textarea id="addLost_message" placeholder="请输入内容" class="layui-textarea"></textarea>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</html>
